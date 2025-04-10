@@ -280,7 +280,12 @@ public partial class MainForm : Form
         pointsFinalTransformed.Clear();
 
         for (int i = 0; i < 4; i++)
-            pointsFinalTransformed.Add(H.Multiply(pointsOrigTransformed[i]));
+        {
+            var result = H.Multiply(pointsOrigTransformed[i]);
+            result /= result[2];
+
+            pointsFinalTransformed.Add(result);
+        }
 
         textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
         foreach (var pt in pointsFinalTransformed)

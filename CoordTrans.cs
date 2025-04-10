@@ -55,7 +55,7 @@ public class CoordTrans
 
         v[0] = (p.X - Umin) / (float)(Umax - Umin) * (Xmax - Xmin) + Xmin;
         v[1] = (p.Y - Vmin) / (float)(Vmax - Vmin) * (Ymax - Ymin) + Ymin;
-        v[2] = 0f;
+        v[2] = 1f;
 
         return v;
     }
