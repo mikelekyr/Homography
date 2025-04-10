@@ -35,15 +35,32 @@ public static class Homography
     /// </summary>
     private static Matrix<float> BuildMatrixA(List<Vector<float>> src, List<Vector<float>> dst)
     {
-        var A = Matrix<float>.Build.Dense(src.Count * 2, 9);
-        for (int i = 0; i < src.Count; i++)
-        {
-            float x = src[i][0], y = src[i][1];
-            float u = dst[i][0], v = dst[i][1];
+        if (src.Count != src.Count)
+            throw new ArgumentException("Point lists must have the same length.");
 
-            A.SetRow(i * 2, [-x, -y, -1, 0, 0, 0, x * u, y * u, u]);
-            A.SetRow(i * 2 + 1, [0, 0, 0, -x, -y, -1, x * v, y * v, v]);
+        int n = src.Count;
+        var A = Matrix<float>.Build.Dense(n * 2, 9);
+
+        for (int i = 0; i < n; i++)
+        {
+            float X = src[i][0];
+            float Y = src[i][1];
+            float x = dst[i][0];
+            float y = dst[i][1];
+
+            // First row for this correspondence
+            A.SetRow(2 * i,
+            [
+                -X, -Y, -1, 0, 0, 0, x * X, x * Y, x
+            ]);
+
+            // Second row for this correspondence
+            A.SetRow(2 * i + 1,
+            [
+                0, 0, 0, -X, -Y, -1, y * X, y * Y, y
+            ]);
         }
+
         return A;
     }
 }
