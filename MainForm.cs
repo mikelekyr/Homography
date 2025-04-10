@@ -16,27 +16,27 @@ public partial class MainForm : Form
     private Bitmap? bitmapRef;
     private Bitmap? bitmapFinal;
 
-    private readonly List<Vector<double>> srcPoints =
+    private readonly Point[] pointsOrig =
     [
-    Vector<double>.Build.Dense([1.5968751, 6.270833]),
-    Vector<double>.Build.Dense([0.6671875, 0.875]),
-    Vector<double>.Build.Dense([6.3109374, 0.7729167]),
-    Vector<double>.Build.Dense([5.479687, 6.3291664]),
+        new(144, 48),
+        new(60, 422),
+        new(579, 424),
+        new(505, 46)
     ];
 
-    private readonly List<Vector<double>> dstPoints =
+    private readonly Point[] pointsRef =
     [
-    Vector<double>.Build.Dense([1.2578125, 6.460417]),
-    Vector<double>.Build.Dense([1.2687501, 0.52500004]),
-    Vector<double>.Build.Dense([5.7312503, 0.5541667]),
-    Vector<double>.Build.Dense([5.7203126, 6.489583]),
+        new(756, 35),
+        new(754, 443),
+        new(1164, 444),
+        new(1164, 35)
     ];
 
     private readonly Point[] pointsFinal = new Point[4];
 
-    private readonly PointF[] pointsOrigTransformed = new PointF[4];
-    private readonly PointF[] pointsRefTransformed = new PointF[4];
-    private readonly PointF[] pointsFinalTransformed = new PointF[4];
+    private readonly List<Vector<float>> pointsOrigTransformed = [];
+    private readonly List<Vector<float>> pointsRefTransformed = [];
+    private readonly List<Vector<float>> pointsFinalTransformed = [];
 
     private int currentIndexOrig = 0;
     private int currentIndexRef = 0;
@@ -81,6 +81,12 @@ public partial class MainForm : Form
         ctFinal.Umax = 640;
         ctFinal.Vmin = 960;
         ctFinal.Vmax = 480;
+
+        bitmapOrig = new("../../../Assets/imageOrig.png");
+        bitmapRef = new("../../../Assets/imageRef.png");
+        bitmapFinal = (Bitmap)bitmapRef.Clone();
+
+        RefreshTextBox();
     }
 
     /// <summary>
@@ -90,31 +96,24 @@ public partial class MainForm : Form
     {
         Point p = e.Location;
 
-        //if (pointsInsertState == PointsInsert.original)
-        //{
-        //    pointsOrig[currentIndexOrig] = p;
+        if (pointsInsertState == PointsInsert.original)
+        {
+            pointsOrig[currentIndexOrig] = p;
 
-        //    currentIndexOrig++;
+            currentIndexOrig++;
 
-        //    if (currentIndexOrig > 3)
-        //        currentIndexOrig = 0;
-        //}
-        //else
-        //{
-        //    pointsRef[currentIndexRef] = p;
+            if (currentIndexOrig > 3)
+                currentIndexOrig = 0;
+        }
+        else
+        {
+            pointsRef[currentIndexRef] = p;
 
-        //    currentIndexRef++;
+            currentIndexRef++;
 
-        //    if (currentIndexRef > 3)
-        //        currentIndexRef = 0;
-        //}
-
-        //// point transformation
-        //for (int i = 0; i < 4; i++)
-        //    pointsOrigTransformed[i] = ctOrig.FromUVtoXY(pointsOrig[i]);
-
-        //for (int i = 0; i < 4; i++)
-        //    pointsRefTransformed[i] = ctRef.FromUVtoXY(pointsRef[i]);
+            if (currentIndexRef > 3)
+                currentIndexRef = 0;
+        }
 
         RefreshTextBox();
 
@@ -214,11 +213,11 @@ public partial class MainForm : Form
         using Pen pRef = new(Brushes.Yellow, 3f);
         using Pen pFinal = new(Brushes.LightGreen, 3f);
 
-        //g.DrawLines(pOrig, pointsOrig);
-        //g.DrawLine(pOrig, pointsOrig[3], pointsOrig[0]);
+        g.DrawLines(pOrig, pointsOrig);
+        g.DrawLine(pOrig, pointsOrig[3], pointsOrig[0]);
 
-        //g.DrawLines(pRef, pointsRef);
-        //g.DrawLine(pRef, pointsRef[3], pointsRef[0]);
+        g.DrawLines(pRef, pointsRef);
+        g.DrawLine(pRef, pointsRef[3], pointsRef[0]);
 
         g.DrawLines(pFinal, pointsFinal);
         g.DrawLine(pFinal, pointsFinal[3], pointsFinal[0]);
@@ -247,100 +246,52 @@ public partial class MainForm : Form
     {
         textBoxInfo.Clear();
 
+        pointsOrigTransformed.Clear();
+        pointsRefTransformed.Clear();
+
+        // point transformation
+        for (int i = 0; i < 4; i++)
+            pointsOrigTransformed.Add(ctOrig.FromUVtoXYVectorFloat(pointsOrig[i]));
+
+        for (int i = 0; i < 4; i++)
+            pointsRefTransformed.Add(ctRef.FromUVtoXYVectorFloat(pointsRef[i]));
+
+        textBoxInfo.AppendText("Original [U,V]:\r\n");
+        foreach (var pt in pointsOrig)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+
         textBoxInfo.AppendText("\r\nOriginal [X,Y]:\r\n");
-        foreach (var pt in srcPoints)
+        foreach (var pt in pointsOrigTransformed)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+
+        textBoxInfo.AppendText("\r\nReference [U,V]:\r\n");
+        foreach (var pt in pointsRef)
             textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
         textBoxInfo.AppendText("\r\nReference [X,Y]:\r\n");
-        foreach (var pt in dstPoints)
+        foreach (var pt in pointsRefTransformed)
             textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        var H = HomographyDLT.ComputeHomography(srcPoints, dstPoints);
+        var H = Homography.Calculate(pointsOrigTransformed, pointsRefTransformed);
 
         textBoxInfo.AppendText("\r\nHomography Matrix H:\r\n");
         textBoxInfo.AppendText(H.ToMatrixString());
 
-        foreach(var v in srcPoints)
-        {
-            var pH = Vector<double>.Build.Dense([v[0], v[1], 0]);
+        pointsFinalTransformed.Clear();
 
-            var rv = H * pH;
-            textBoxInfo.AppendText(rv.ToString() + "\r\n");
-        }
+        for (int i = 0; i < 4; i++)
+            pointsFinalTransformed.Add(H.Multiply(pointsOrigTransformed[i]));
 
-        //textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
-        //foreach (var pt in pointsFinalTransformed)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
+        foreach (var pt in pointsFinalTransformed)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        //// point transformation
-        //for (int i = 0; i < 4; i++)
-        //    pointsFinal[i] = ctFinal.FromXYtoUV(pointsFinalTransformed[i]);
+        // point transformation
+        for (int i = 0; i < 4; i++)
+            pointsFinal[i] = ctFinal.FromXYVectorFtoUV(pointsFinalTransformed[i]);
 
-        //textBoxInfo.AppendText("\r\nFinal [U,V]:\r\n");
-        //foreach (var pt in pointsFinal)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("\r\nFinal [U,V]:\r\n");
+        foreach (var pt in pointsFinal)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
     }
-
-    private void RefreshTextBox2()
-    {
-        //textBoxInfo.Clear();
-
-        //PointF[] sourcePoints = new PointF[4];
-        //PointF[] targetPoints = new PointF[4];
-
-
-        //textBoxInfo.AppendText("Original [U,V]:\r\n");
-        //foreach (var pt in pointsOrig)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
-
-        //textBoxInfo.AppendText("\r\nReference [U,V]:\r\n");
-        //foreach (var pt in pointsRef)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
-
-        //for(int i = 0;i < 4; i++)
-        //{
-        //    sourcePoints[i] = new PointF(pointsOrig[i].X, pointsOrig[i].Y);
-        //    targetPoints[i] = new PointF(pointsRef[i].X, pointsRef[i].Y);
-        //}
-
-        //textBoxInfo.AppendText("\r\nSource points [U,V]:\r\n");
-        //foreach (var pt in sourcePoints)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
-
-        //textBoxInfo.AppendText("\r\nTarget points [U,V]:\r\n");
-        //foreach (var pt in targetPoints)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
-
-
-        //var H = Homography.Calculate(sourcePoints, targetPoints);
-
-        //textBoxInfo.AppendText("\r\nHomography Matrix H:\r\n");
-        //textBoxInfo.AppendText(H.ToMatrixString());
-
-        //var vector = Vector<double>.Build.DenseOfArray(new double[3]);
-
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    vector[0] = pointsOrig[i].X;
-        //    vector[1] = pointsOrig[i].Y;
-        //    vector[2] = 1.0;
-
-        //    var resultPt = H.Multiply(vector);
-
-        //    pointsFinalTransformed[i] = new PointF((float)resultPt[0], (float)resultPt[1]);
-        //}
-
-        //textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
-        //foreach (var pt in pointsFinalTransformed)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
-
-        //// point transformation
-        //for (int i = 0; i < 4; i++)
-        //    pointsFinal[i] = ctFinal.FromXYtoUV(pointsFinalTransformed[i]);
-
-        //textBoxInfo.AppendText("\r\nFinal [U,V]:\r\n");
-        //foreach (var pt in pointsFinal)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
-    }
-
 }

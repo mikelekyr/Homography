@@ -77,6 +77,7 @@
             textBoxInfo.Location = new Point(12, 110);
             textBoxInfo.Multiline = true;
             textBoxInfo.Name = "textBoxInfo";
+            textBoxInfo.ScrollBars = ScrollBars.Vertical;
             textBoxInfo.Size = new Size(243, 862);
             textBoxInfo.TabIndex = 2;
             // 

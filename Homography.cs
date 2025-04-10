@@ -1,14 +1,16 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
-using System.Diagnostics;
 
 namespace HomographyApp;
 
 public static class Homography
 {
-    public static Matrix<double> Calculate(PointF[] sourcePoints, PointF[] targetPoints)
+    /// <summary>
+    /// Calculate
+    /// </summary>
+    public static Matrix<float> Calculate(List<Vector<float>> src, List<Vector<float>> dst)
     {
         // Build A
-        var A = BuildMatrixA(sourcePoints, targetPoints);
+        var A = BuildMatrixA(src, dst);
 
         // Compute SVD
         var svd = A.Svd(computeVectors: true);
@@ -16,7 +18,7 @@ public static class Homography
         var h = V.Column(V.ColumnCount - 1);
 
         // Reshape h into 3x3 matrix
-        var H = Matrix<double>.Build.Dense(3, 3);
+        var H = Matrix<float>.Build.Dense(3, 3);
         for (int i = 0; i < 9; i++)
         {
             H[i / 3, i % 3] = h[i];
@@ -31,36 +33,17 @@ public static class Homography
     /// <summary>
     /// BuildMatrixA
     /// </summary>
-    private static Matrix<double> BuildMatrixA(PointF[] sourcePoints, PointF[] targetPoints)
+    private static Matrix<float> BuildMatrixA(List<Vector<float>> src, List<Vector<float>> dst)
     {
-        if (sourcePoints.Length != targetPoints.Length)
-            throw new ArgumentException("Point lists must have the same length.");
-
-        int n = sourcePoints.Length;
-        var A = Matrix<double>.Build.Dense(n * 2, 9);
-
-        for (int i = 0; i < n; i++)
+        var A = Matrix<float>.Build.Dense(src.Count * 2, 9);
+        for (int i = 0; i < src.Count; i++)
         {
-            double X = sourcePoints[i].X;
-            double Y = sourcePoints[i].Y;
-            double x = targetPoints[i].X;
-            double y = targetPoints[i].Y;
+            float x = src[i][0], y = src[i][1];
+            float u = dst[i][0], v = dst[i][1];
 
-            // First row for this correspondence
-            A.SetRow(2 * i,
-            [
-                -X, -Y, -1, 0, 0, 0, x * X, x * Y, x
-            ]);
-
-            // Second row for this correspondence
-            A.SetRow(2 * i + 1,
-            [
-                0, 0, 0, -X, -Y, -1, y * X, y * Y, y
-            ]);
+            A.SetRow(i * 2, [-x, -y, -1, 0, 0, 0, x * u, y * u, u]);
+            A.SetRow(i * 2 + 1, [0, 0, 0, -x, -y, -1, x * v, y * v, v]);
         }
-
-        Debug.WriteLine(A.ToMatrixString());
-
         return A;
     }
 }

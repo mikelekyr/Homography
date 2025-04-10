@@ -61,6 +61,15 @@ public class CoordTrans
     }
 
     /// <summary>
+    /// FromXYtoUVF
+    /// </summary>
+    public Point FromXYVectorFtoUV(Vector<float> p)
+    {
+        return new Point((int)((p[0] - Xmin) / (Xmax - Xmin) * (Umax - Umin) + Umin),
+                         (int)((p[1] - Ymin) / (Ymax - Ymin) * (Vmax - Vmin) + Vmin));
+    }
+
+    /// <summary>
     /// GetUVF
     /// </summary>
     public PointF GetUVF(Vector<float> v)
@@ -85,7 +94,7 @@ public class CoordTrans
     /// <summary>
     /// Calculates distance between two points
     /// </summary>
-    public  float CalculateDistanceBetweenPoints(Vector<float> point1, Vector<float> point2)
+    public static float CalculateDistanceBetweenPoints(Vector<float> point1, Vector<float> point2)
     {
         float deltaX = Math.Abs(point1[0] - point2[0]);
         float deltaY = Math.Abs(point1[1] - point2[1]);
