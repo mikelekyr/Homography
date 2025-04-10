@@ -26,8 +26,8 @@ public partial class MainForm : Form
 
     private readonly Point[] pointsRef =
     [
-        new(756, 35),
-        new(754, 443),
+        new(754, 35),
+        new(754, 444),
         new(1164, 444),
         new(1164, 35)
     ];
