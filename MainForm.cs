@@ -44,6 +44,8 @@ public partial class MainForm : Form
     private readonly CoordTrans ctOrig = new();
     private readonly CoordTrans ctRef = new();
     private readonly CoordTrans ctFinal = new();
+    private readonly CoordTrans ctImageNormalisedOrig = new();
+    private readonly CoordTrans ctImageNormalisedRef = new();
 
     public MainForm()
     {
@@ -51,36 +53,58 @@ public partial class MainForm : Form
 
         // coord trans original
         ctOrig.Xmin = 0f;
-        ctOrig.Xmax = 7f;
+        ctOrig.Xmax = 0.93333f;
         ctOrig.Ymin = 0f;
         ctOrig.Ymax = 7f;
 
         ctOrig.Umin = 0;
-        ctOrig.Umax = 640;
-        ctOrig.Vmin = 480;
+        ctOrig.Umax = 639;
+        ctOrig.Vmin = 479;
         ctOrig.Vmax = 0;
 
         // coord trans reference
         ctRef.Xmin = 0f;
-        ctRef.Xmax = 7f;
+        ctRef.Xmax = 0.93333f;
         ctRef.Ymin = 0f;
         ctRef.Ymax = 7f;
 
         ctRef.Umin = 640;
-        ctRef.Umax = 1280;
-        ctRef.Vmin = 480;
+        ctRef.Umax = 1279;
+        ctRef.Vmin = 479;
         ctRef.Vmax = 0;
 
         // coord trans final
         ctFinal.Xmin = 0f;
-        ctFinal.Xmax = 7f;
+        ctFinal.Xmax = 0.93333f;
         ctFinal.Ymin = 0f;
         ctFinal.Ymax = 7f;
 
         ctFinal.Umin = 0;
-        ctFinal.Umax = 640;
-        ctFinal.Vmin = 960;
+        ctFinal.Umax = 639;
+        ctFinal.Vmin = 959;
         ctFinal.Vmax = 480;
+
+        // coord trans Image Normalised origina;
+        ctImageNormalisedOrig.Xmin = 0f;
+        ctImageNormalisedOrig.Xmax = 1f;
+        ctImageNormalisedOrig.Ymin = 0f;
+        ctImageNormalisedOrig.Ymax = 1f;
+
+        ctImageNormalisedOrig.Umin = 0;
+        ctImageNormalisedOrig.Umax = 639;
+        ctImageNormalisedOrig.Vmin = 479;
+        ctImageNormalisedOrig.Vmax = 0;
+
+        // coord trans Image Normalised reference
+        ctImageNormalisedRef.Xmin = 0f;
+        ctImageNormalisedRef.Xmax = 1f;
+        ctImageNormalisedRef.Ymin = 0f;
+        ctImageNormalisedRef.Ymax = 1f;
+
+        ctImageNormalisedRef.Umin = 640;
+        ctImageNormalisedRef.Umax = 1279;
+        ctImageNormalisedRef.Vmin = 479;
+        ctImageNormalisedRef.Vmax = 0;
 
         bitmapOrig = new("../../../Assets/imageOrig.png");
         bitmapRef = new("../../../Assets/imageRef.png");
@@ -244,6 +268,8 @@ public partial class MainForm : Form
     /// </summary>
     private void RefreshTextBox()
     {
+        ArgumentNullException.ThrowIfNull(bitmapOrig);
+
         textBoxInfo.Clear();
 
         pointsOrigTransformed.Clear();
@@ -251,27 +277,28 @@ public partial class MainForm : Form
 
         // point transformation
         for (int i = 0; i < 4; i++)
+        {
             pointsOrigTransformed.Add(ctOrig.FromUVtoXYVectorFloat(pointsOrig[i]));
-
-        for (int i = 0; i < 4; i++)
             pointsRefTransformed.Add(ctRef.FromUVtoXYVectorFloat(pointsRef[i]));
+        }
 
-        textBoxInfo.AppendText("Original [U,V]:\r\n");
-        foreach (var pt in pointsOrig)
-            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        //textBoxInfo.AppendText("Original [U,V]:\r\n");
+        //foreach (var pt in pointsOrig)
+        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        textBoxInfo.AppendText("\r\nOriginal [X,Y]:\r\n");
-        foreach (var pt in pointsOrigTransformed)
-            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        //textBoxInfo.AppendText("\r\nOriginal [X,Y]:\r\n");
+        //foreach (var pt in pointsOrigTransformed)
+        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        textBoxInfo.AppendText("\r\nReference [U,V]:\r\n");
-        foreach (var pt in pointsRef)
-            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        //textBoxInfo.AppendText("\r\nReference [U,V]:\r\n");
+        //foreach (var pt in pointsRef)
+        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        textBoxInfo.AppendText("\r\nReference [X,Y]:\r\n");
-        foreach (var pt in pointsRefTransformed)
-            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        //textBoxInfo.AppendText("\r\nReference [X,Y]:\r\n");
+        //foreach (var pt in pointsRefTransformed)
+        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
+        // calculate homography for real world coordinates
         var H = Homography.Calculate(pointsOrigTransformed, pointsRefTransformed);
 
         textBoxInfo.AppendText("\r\nHomography Matrix H:\r\n");
@@ -287,16 +314,33 @@ public partial class MainForm : Form
             pointsFinalTransformed.Add(result);
         }
 
-        textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
-        foreach (var pt in pointsFinalTransformed)
-            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        //textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
+        //foreach (var pt in pointsFinalTransformed)
+        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
         // point transformation
         for (int i = 0; i < 4; i++)
             pointsFinal[i] = ctFinal.FromXYVectorFtoUV(pointsFinalTransformed[i]);
 
-        textBoxInfo.AppendText("\r\nFinal [U,V]:\r\n");
-        foreach (var pt in pointsFinal)
-            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        //textBoxInfo.AppendText("\r\nFinal [U,V]:\r\n");
+        //foreach (var pt in pointsFinal)
+        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+
+        List<Vector<float>> pointOrigList = [];
+        List<Vector<float>> pointRefList = [];
+
+        // point transformation
+        for (int i = 0; i < 4; i++)
+        {
+            pointOrigList.Add(ctImageNormalisedOrig.FromUVtoXYVectorFloat(pointsOrig[i]));
+            pointRefList.Add(ctImageNormalisedRef.FromUVtoXYVectorFloat(pointsRef[i]));
+        }
+
+        var HImage = Homography.Calculate(pointOrigList, pointRefList);
+
+        textBoxInfo.AppendText("\r\nHomography Matrix HImage:\r\n");
+        textBoxInfo.AppendText(HImage.ToMatrixString());
+
+        bitmapFinal = Homography.ComputeOutputImage(bitmapOrig, HImage);
     }
 }
