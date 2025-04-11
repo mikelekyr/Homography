@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using System.Linq.Expressions;
 
 namespace HomographyApp;
 
@@ -72,33 +73,29 @@ public static class Homography
         ArgumentNullException.ThrowIfNull(origImage);
         ArgumentNullException.ThrowIfNull(H);
 
-        var Hinv = H;
+        var Hinv = H.Inverse();
 
         int width = origImage.Width;
         int height = origImage.Height;
 
         Bitmap outputImage = new(width, height);
 
-        for (int y = 0; y < height; y++)
+        for (int v = 0; v < height; v++)
         {
-            for (int x = 0; x < width; x++)
+            for (int u = 0; u < width; u++)
             {
-                // Map output pixel (x, y) back to source (u, v)
-                var destPoint = Vector<float>.Build.Dense([x, y, 1]);
+                var destPoint = ctOrig.FromUVtoXYVectorFloat(new Point(u, v));
+
                 var srcPoint = Hinv.Multiply(destPoint);
+                srcPoint /= srcPoint[2];
 
-                float u = srcPoint[0] / srcPoint[2];
-                float v = srcPoint[1] / srcPoint[2];
+                var sourcePointXY = ctOrig.FromXYVectorFtoUV(srcPoint);
 
-                var uvPoint = ctOrig.FromXYVectorFtoUV(Vector<float>.Build.Dense([u, v, 1]));
-                var xyPoint = ctOrig.FromXYVectorFtoUV(destPoint);
-
-                // Check if (u,v) is inside input image
-                if (uvPoint.X >= 0 && uvPoint.Y >= 0 && uvPoint.X < width && xyPoint.Y < height)
+                if (sourcePointXY.X >= 0 && sourcePointXY.Y >= 0 && sourcePointXY.X < width && sourcePointXY.Y < height)
                 {
                     // Sample pixel color (nearest neighbor)
-                    Color color = origImage.GetPixel(uvPoint.X, uvPoint.Y);
-                    outputImage.SetPixel(xyPoint.X, xyPoint.Y, color);
+                    Color color = origImage.GetPixel(sourcePointXY.X, sourcePointXY.Y);
+                    outputImage.SetPixel(u, v, color);
                 }
             }
         }

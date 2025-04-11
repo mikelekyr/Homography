@@ -282,21 +282,21 @@ public partial class MainForm : Form
             pointsRefTransformed.Add(ctRef.FromUVtoXYVectorFloat(pointsRef[i]));
         }
 
-        //textBoxInfo.AppendText("Original [U,V]:\r\n");
-        //foreach (var pt in pointsOrig)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("Original [U,V]:\r\n");
+        foreach (var pt in pointsOrig)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        //textBoxInfo.AppendText("\r\nOriginal [X,Y]:\r\n");
-        //foreach (var pt in pointsOrigTransformed)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("\r\nOriginal [X,Y]:\r\n");
+        foreach (var pt in pointsOrigTransformed)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        //textBoxInfo.AppendText("\r\nReference [U,V]:\r\n");
-        //foreach (var pt in pointsRef)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("\r\nReference [U,V]:\r\n");
+        foreach (var pt in pointsRef)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
-        //textBoxInfo.AppendText("\r\nReference [X,Y]:\r\n");
-        //foreach (var pt in pointsRefTransformed)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("\r\nReference [X,Y]:\r\n");
+        foreach (var pt in pointsRefTransformed)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
         // calculate homography for real world coordinates
         var H = Homography.Calculate(pointsOrigTransformed, pointsRefTransformed);
@@ -314,17 +314,17 @@ public partial class MainForm : Form
             pointsFinalTransformed.Add(result);
         }
 
-        //textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
-        //foreach (var pt in pointsFinalTransformed)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("\r\nFinal [X,Y]:\r\n");
+        foreach (var pt in pointsFinalTransformed)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
         // point transformation
         for (int i = 0; i < 4; i++)
             pointsFinal[i] = ctFinal.FromXYVectorFtoUV(pointsFinalTransformed[i]);
 
-        //textBoxInfo.AppendText("\r\nFinal [U,V]:\r\n");
-        //foreach (var pt in pointsFinal)
-        //    textBoxInfo.AppendText(pt.ToString() + "\r\n");
+        textBoxInfo.AppendText("\r\nFinal [U,V]:\r\n");
+        foreach (var pt in pointsFinal)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
         List<Vector<float>> pointOrigList = [];
         List<Vector<float>> pointRefList = [];
