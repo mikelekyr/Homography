@@ -53,7 +53,7 @@ public partial class MainForm : Form
 
         // coord trans original
         ctOrig.Xmin = 0f;
-        ctOrig.Xmax = 0.93333f;
+        ctOrig.Xmax = 9.3333f;
         ctOrig.Ymin = 0f;
         ctOrig.Ymax = 7f;
 
@@ -64,7 +64,7 @@ public partial class MainForm : Form
 
         // coord trans reference
         ctRef.Xmin = 0f;
-        ctRef.Xmax = 0.93333f;
+        ctRef.Xmax = 9.3333f;
         ctRef.Ymin = 0f;
         ctRef.Ymax = 7f;
 
@@ -75,7 +75,7 @@ public partial class MainForm : Form
 
         // coord trans final
         ctFinal.Xmin = 0f;
-        ctFinal.Xmax = 0.93333f;
+        ctFinal.Xmax = 9.3333f;
         ctFinal.Ymin = 0f;
         ctFinal.Ymax = 7f;
 
