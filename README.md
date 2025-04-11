@@ -4,7 +4,7 @@ If images of different sizes are meant to be used, change Coordinate transformat
 
 Don't forget to change your monitor zoom to 100%. Default value is usually set to 125%, which will spoil the projection - GDI is not able to deal with it correctly, but it is not important, since the only thing we care about is the H matrix at the end, and the technology used to draw the pictures is irrelevant.
 
-We are using calculated H matrix for line following robot, to calculate correct track segment lengths. 
+We are using calculated H matrix for our line following robot, to calculate correct track segment lengths. 
 
 ![image_2025-04-11_114032780](https://github.com/user-attachments/assets/a6c1f824-785d-4b6d-8ddb-77b8fee0788c)
 
