@@ -67,12 +67,12 @@ public static class Homography
     /// <summary>
     /// Compute output image
     /// </summary>
-    public static Bitmap ComputeOutputImage(Bitmap origImage, Matrix<float> H)
+    public static Bitmap ComputeOutputImage(Bitmap origImage, Matrix<float> H, CoordTrans ctOrig)
     {
         ArgumentNullException.ThrowIfNull(origImage);
         ArgumentNullException.ThrowIfNull(H);
 
-        var Hinv = H.Inverse();
+        var Hinv = H;
 
         int width = origImage.Width;
         int height = origImage.Height;
@@ -90,14 +90,15 @@ public static class Homography
                 float u = srcPoint[0] / srcPoint[2];
                 float v = srcPoint[1] / srcPoint[2];
 
-                //int 
+                var uvPoint = ctOrig.FromXYVectorFtoUV(Vector<float>.Build.Dense([u, v, 1]));
+                var xyPoint = ctOrig.FromXYVectorFtoUV(destPoint);
 
                 // Check if (u,v) is inside input image
-                if (u >= 0 && v >= 0 && u < width && v < height)
+                if (uvPoint.X >= 0 && uvPoint.Y >= 0 && uvPoint.X < width && xyPoint.Y < height)
                 {
                     // Sample pixel color (nearest neighbor)
-                    Color color = origImage.GetPixel((int)u, (int)v);
-                    outputImage.SetPixel(x, y, color);
+                    Color color = origImage.GetPixel(uvPoint.X, uvPoint.Y);
+                    outputImage.SetPixel(xyPoint.X, xyPoint.Y, color);
                 }
             }
         }

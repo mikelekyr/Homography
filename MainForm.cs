@@ -336,11 +336,19 @@ public partial class MainForm : Form
             pointRefList.Add(ctImageNormalisedRef.FromUVtoXYVectorFloat(pointsRef[i]));
         }
 
+        textBoxInfo.AppendText("\r\nOriginal normalised [X,Y]:\r\n");
+        foreach (var pt in pointOrigList)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+
+        textBoxInfo.AppendText("\r\nReference normalised [X,Y]:\r\n");
+        foreach (var pt in pointRefList)
+            textBoxInfo.AppendText(pt.ToString() + "\r\n");
+
         var HImage = Homography.Calculate(pointOrigList, pointRefList);
 
         textBoxInfo.AppendText("\r\nHomography Matrix HImage:\r\n");
         textBoxInfo.AppendText(HImage.ToMatrixString());
 
-        bitmapFinal = Homography.ComputeOutputImage(bitmapOrig, HImage);
+        bitmapFinal = Homography.ComputeOutputImage(bitmapOrig, HImage, ctImageNormalisedOrig);
     }
 }
