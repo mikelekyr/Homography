@@ -92,6 +92,34 @@ public class CoordTrans
     }
 
     /// <summary>
+    /// MatrixFWithPointOffset
+    /// </summary>
+    public Vector<float> MatrixFWithPointOffset(Vector<float> point, Point offset)
+    {
+        float ratioX = (Umax - Umin) / (Xmax - Xmin);
+        float ratioY = (Vmax - Vmin) / (Ymax - Ymin);
+
+        Vector<float> v = Vector<float>.Build.Dense(3);
+
+        v[0] = point[0] + (offset.X / ratioX);
+        v[1] = point[1] + (offset.Y / ratioY);
+        v[2] = 1f;
+
+        return v;
+    }
+
+    /// <summary>
+    /// Calculate angle between points
+    /// </summary>
+    public static float GetAngleBetweenPoints(Vector<float> refPoint, Vector<float> endPoint)
+    {
+        float dY = endPoint[1] - refPoint[1];
+        float dX = endPoint[0] - refPoint[0];
+
+        return (float)Math.Atan2(dY, dX);
+    }
+
+    /// <summary>
     /// Calculates distance between two points
     /// </summary>
     public static float CalculateDistanceBetweenPoints(Vector<float> point1, Vector<float> point2)
@@ -100,5 +128,119 @@ public class CoordTrans
         float deltaY = Math.Abs(point1[1] - point2[1]);
 
         return (float)Math.Sqrt((deltaX * deltaX) + (deltaY * deltaY));
+    }
+
+    /// <summary>
+    /// Get distance between points
+    /// </summary>
+    public static float GetDistanceBetweenPoints(Vector<float> refPoint, Vector<float> endPoint)
+    {
+        float dY = endPoint[1] - refPoint[1];
+        float dX = endPoint[0] - refPoint[0];
+
+        return (float)Math.Sqrt((dX * dX) + (dY * dY));
+    }
+
+    /// <summary>
+    /// Rotate point upon another point
+    /// </summary>
+    public static Vector<float> RotatePointAroundPoint(Vector<float> refPoint, Vector<float> endPoint, float angle)
+    {
+        float shiftX = refPoint[0];
+        float shiftY = refPoint[1];
+
+        var matrixNegativeTranslate = BuildTranslationMatrix(-shiftX, -shiftY);
+        var matrixRotate = BuildRotationMatrix(angle);
+        var matrixPositiveTranslate = BuildTranslationMatrix(shiftX, shiftY);
+
+        var matrixTransform = matrixPositiveTranslate * matrixRotate * matrixNegativeTranslate;
+
+        return matrixTransform * endPoint;
+    }
+
+    /// <summary>
+    /// Linked node rotation
+    /// </summary>
+    public static Vector<float> LinkedNodeRotation(Vector<float> refPoint, float radius, float theta)
+    {
+        float origX = refPoint[0];
+        float origY = refPoint[1];
+
+        float newX = radius * (float)Math.Cos(theta);
+        float newY = radius * (float)Math.Sin(theta);
+
+        Vector<float> v = Vector<float>.Build.Dense(3);
+
+        v[0] = newX + origX;
+        v[1] = newY + origY;
+        v[2] = 1f;
+
+        return v;
+    }
+
+    /// <summary>
+    /// BuildTranslationMatrix
+    /// </summary>
+    public static Matrix<float> BuildTranslationMatrix(float x, float y)
+    {
+        var matrix = Matrix<float>.Build.DenseIdentity(3);
+
+        matrix[0, 0] = 1f;
+        matrix[0, 1] = 0f;
+        matrix[0, 2] = x;
+
+        matrix[1, 0] = 0f;
+        matrix[1, 1] = 1f;
+        matrix[1, 2] = y;
+
+        matrix[2, 0] = 0f;
+        matrix[2, 1] = 0f;
+        matrix[2, 2] = 1f;
+
+        return matrix;
+    }
+
+    /// <summary>
+    /// Create a rotation matrix that rotates values around point (0,0)
+    /// </summary>
+    public static Matrix<float> BuildRotationMatrix(float angle)
+    {
+        var matrix = Matrix<float>.Build.DenseIdentity(3);
+
+        matrix[0, 0] = (float)Math.Cos(angle);
+        matrix[0, 1] = (float)-Math.Sin(angle);
+        matrix[0, 2] = 0f;
+
+        matrix[1, 0] = (float)Math.Sin(angle);
+        matrix[1, 1] = (float)Math.Cos(angle);
+        matrix[1, 2] = 0f;
+
+        matrix[2, 0] = 0f;
+        matrix[2, 1] = 0f;
+        matrix[2, 2] = 1f;
+
+        return matrix;
+    }
+
+    /// <summary>
+    /// BuildScalingMatrix
+    /// </summary>
+    public static Matrix<float> BuildScalingMatrix(float xScale, float yScale)
+    {
+        var matrix = Matrix<float>.Build.DenseIdentity(3);
+
+        matrix[0, 0] = xScale;
+        matrix[0, 1] = 0f;
+        matrix[0, 2] = 0f;
+
+        matrix[1, 0] = 0f;
+        matrix[1, 1] = yScale;
+        matrix[1, 2] = 0f;
+
+        matrix[2, 0] = 0f;
+        matrix[2, 1] = 0f;
+        matrix[2, 2] = 1f;
+
+        return matrix;
     }
 }
