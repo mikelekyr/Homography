@@ -1,4 +1,6 @@
 using MathNet.Numerics.LinearAlgebra;
+using System.IO;
+using System.Text.Json;
 
 namespace HomographyApp;
 
@@ -46,6 +48,8 @@ public partial class MainForm : Form
     private readonly CoordTrans ctFinal = new();
     private readonly CoordTrans ctImageNormalisedOrig = new();
     private readonly CoordTrans ctImageNormalisedRef = new();
+
+    private Matrix<float>? H; 
 
     public MainForm()
     {
@@ -110,7 +114,7 @@ public partial class MainForm : Form
         bitmapRef = new("../../../Assets/imageRef.png");
         bitmapFinal = (Bitmap)bitmapRef.Clone();
 
-        RefreshTextBox();
+        RefreshData();
     }
 
     /// <summary>
@@ -139,80 +143,7 @@ public partial class MainForm : Form
                 currentIndexRef = 0;
         }
 
-        RefreshTextBox();
-
-        panelDrawing.Invalidate();
-    }
-
-    /// <summary>
-    /// ButtonLoadOrigImage_Click
-    /// </summary>
-    private void ButtonLoadOrigImage_Click(object sender, EventArgs e)
-    {
-        OpenFileDialog openFileDialog = new()
-        {
-            InitialDirectory = @"Desktop",
-            RestoreDirectory = true,
-            Title = "Browse PNG Files",
-            DefaultExt = "png",
-            Filter = "png files (*.png)|*.png|All files (*.*)|*.*",
-            FilterIndex = 2,
-            CheckFileExists = true,
-            CheckPathExists = true
-        };
-        openFileDialog.ShowDialog();
-
-        string bitmapPath = openFileDialog.FileName;
-
-        if (string.IsNullOrEmpty(bitmapPath))
-            return;
-
-        try
-        {
-            bitmapOrig = new(bitmapPath);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Error loading bitmap" + ex.Message);
-            return;
-        }
-
-        panelDrawing.Invalidate();
-    }
-
-    /// <summary>
-    /// ButtonRef_Click
-    /// </summary>
-    private void ButtonRef_Click(object sender, EventArgs e)
-    {
-        OpenFileDialog openFileDialog = new()
-        {
-            InitialDirectory = @"Desktop",
-            RestoreDirectory = true,
-            Title = "Browse PNG Files",
-            DefaultExt = "png",
-            Filter = "png files (*.png)|*.png|All files (*.*)|*.*",
-            FilterIndex = 2,
-            CheckFileExists = true,
-            CheckPathExists = true
-        };
-        openFileDialog.ShowDialog();
-
-        string bitmapPath = openFileDialog.FileName;
-
-        if (string.IsNullOrEmpty(bitmapPath))
-            return;
-
-        try
-        {
-            bitmapRef = new(bitmapPath);
-            bitmapFinal = (Bitmap)bitmapRef.Clone();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Error loading bitmap" + ex.Message);
-            return;
-        }
+        RefreshData();
 
         panelDrawing.Invalidate();
     }
@@ -266,7 +197,7 @@ public partial class MainForm : Form
     /// <summary>
     /// Refresh text box
     /// </summary>
-    private void RefreshTextBox()
+    private void RefreshData()
     {
         ArgumentNullException.ThrowIfNull(bitmapOrig);
 
@@ -299,7 +230,7 @@ public partial class MainForm : Form
             textBoxInfo.AppendText(pt.ToString() + "\r\n");
 
         // calculate homography for real world coordinates
-        var H = Homography.Calculate(pointsOrigTransformed, pointsRefTransformed);
+        H = Homography.Calculate(pointsOrigTransformed, pointsRefTransformed);
 
         textBoxInfo.AppendText("\r\nHomography Matrix H:\r\n");
         textBoxInfo.AppendText(H.ToMatrixString());
@@ -350,5 +281,129 @@ public partial class MainForm : Form
         textBoxInfo.AppendText(HImage.ToMatrixString());
 
         bitmapFinal = Homography.ComputeOutputImage(bitmapOrig, HImage, ctImageNormalisedOrig);
+    }
+
+    /// <summary>
+    /// ButtonLoadOrigImage_Click
+    /// </summary>
+    private void ButtonLoadOrigImage_Click(object sender, EventArgs e)
+    {
+        OpenFileDialog openFileDialog = new()
+        {
+            InitialDirectory = @"Desktop",
+            RestoreDirectory = true,
+            Title = "Browse PNG Files",
+            DefaultExt = "png",
+            Filter = "png files (*.png)|*.png|All files (*.*)|*.*",
+            FilterIndex = 2,
+            CheckFileExists = true,
+            CheckPathExists = true
+        };
+        openFileDialog.ShowDialog();
+
+        string bitmapPath = openFileDialog.FileName;
+
+        if (string.IsNullOrEmpty(bitmapPath))
+            return;
+
+        try
+        {
+            bitmapOrig = new(bitmapPath);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error loading bitmap" + ex.Message);
+            return;
+        }
+
+        panelDrawing.Invalidate();
+    }
+
+    /// <summary>
+    /// ButtonSaveMatrixH_Click
+    /// </summary>
+    private void ButtonSaveMatrixH_Click(object sender, EventArgs e)
+    {
+        if (H == null)
+        {
+            MessageBox.Show("Matrix does not exist.");
+            return;
+        }
+
+        using SaveFileDialog saveFileDialog = new SaveFileDialog
+        {
+            InitialDirectory = @"Desktop",
+            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            Title = "Save matrix as JSON",
+            DefaultExt = "json",
+            FileName = "MatrixH.json"
+        };
+
+        saveFileDialog.ShowDialog();
+
+        string filePath = saveFileDialog.FileName;
+
+        if (string.IsNullOrEmpty(filePath))
+            return;
+
+        try
+        {
+            // Convert to jagged array
+            float[][] jagged = new float[H.RowCount][];
+            for (int i = 0; i < H.RowCount; i++)
+            {
+                jagged[i] = [.. H.Row(i)];
+            }
+
+            var json = JsonSerializer.Serialize(jagged, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            File.WriteAllText(saveFileDialog.FileName, json);
+            MessageBox.Show("Matrix saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error saving matrix to file" + ex.Message);
+            return;
+        }
+    }
+
+    /// <summary>
+    /// ButtonRef_Click
+    /// </summary>
+    private void ButtonRef_Click(object sender, EventArgs e)
+    {
+        OpenFileDialog openFileDialog = new()
+        {
+            InitialDirectory = @"Desktop",
+            RestoreDirectory = true,
+            Title = "Browse PNG Files",
+            DefaultExt = "png",
+            Filter = "png files (*.png)|*.png|All files (*.*)|*.*",
+            FilterIndex = 2,
+            CheckFileExists = true,
+            CheckPathExists = true
+        };
+        openFileDialog.ShowDialog();
+
+        string bitmapPath = openFileDialog.FileName;
+
+        if (string.IsNullOrEmpty(bitmapPath))
+            return;
+
+        try
+        {
+            bitmapRef = new(bitmapPath);
+            bitmapFinal = (Bitmap)bitmapRef.Clone();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error loading bitmap" + ex.Message);
+            return;
+        }
+
+        panelDrawing.Invalidate();
     }
 }

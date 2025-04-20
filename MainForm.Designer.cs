@@ -35,12 +35,14 @@
             buttonRef = new Button();
             buttonLoadOrigImage = new Button();
             panelDrawing = new Panel();
+            buttonSaveMatrixH = new Button();
             panelMenu.SuspendLayout();
             SuspendLayout();
             // 
             // panelMenu
             // 
             panelMenu.BackColor = Color.DarkGray;
+            panelMenu.Controls.Add(buttonSaveMatrixH);
             panelMenu.Controls.Add(buttonPointsRef);
             panelMenu.Controls.Add(buttonPointsOrig);
             panelMenu.Controls.Add(textBoxInfo);
@@ -54,9 +56,9 @@
             // 
             // buttonPointsRef
             // 
-            buttonPointsRef.Location = new Point(140, 55);
+            buttonPointsRef.Location = new Point(140, 44);
             buttonPointsRef.Name = "buttonPointsRef";
-            buttonPointsRef.Size = new Size(115, 37);
+            buttonPointsRef.Size = new Size(115, 26);
             buttonPointsRef.TabIndex = 4;
             buttonPointsRef.Text = "Points Ref";
             buttonPointsRef.UseVisualStyleBackColor = true;
@@ -66,7 +68,7 @@
             // 
             buttonPointsOrig.Location = new Point(140, 12);
             buttonPointsOrig.Name = "buttonPointsOrig";
-            buttonPointsOrig.Size = new Size(115, 37);
+            buttonPointsOrig.Size = new Size(115, 26);
             buttonPointsOrig.TabIndex = 3;
             buttonPointsOrig.Text = "Points Orig";
             buttonPointsOrig.UseVisualStyleBackColor = true;
@@ -74,18 +76,18 @@
             // 
             // textBoxInfo
             // 
-            textBoxInfo.Location = new Point(12, 110);
+            textBoxInfo.Location = new Point(12, 108);
             textBoxInfo.Multiline = true;
             textBoxInfo.Name = "textBoxInfo";
             textBoxInfo.ScrollBars = ScrollBars.Vertical;
-            textBoxInfo.Size = new Size(243, 862);
+            textBoxInfo.Size = new Size(243, 864);
             textBoxInfo.TabIndex = 2;
             // 
             // buttonRef
             // 
-            buttonRef.Location = new Point(12, 55);
+            buttonRef.Location = new Point(12, 44);
             buttonRef.Name = "buttonRef";
-            buttonRef.Size = new Size(122, 37);
+            buttonRef.Size = new Size(122, 26);
             buttonRef.TabIndex = 1;
             buttonRef.Text = "Load Ref";
             buttonRef.UseVisualStyleBackColor = true;
@@ -95,7 +97,7 @@
             // 
             buttonLoadOrigImage.Location = new Point(12, 12);
             buttonLoadOrigImage.Name = "buttonLoadOrigImage";
-            buttonLoadOrigImage.Size = new Size(122, 37);
+            buttonLoadOrigImage.Size = new Size(122, 26);
             buttonLoadOrigImage.TabIndex = 0;
             buttonLoadOrigImage.Text = "Load Orig";
             buttonLoadOrigImage.UseVisualStyleBackColor = true;
@@ -111,6 +113,16 @@
             panelDrawing.TabIndex = 1;
             panelDrawing.Paint += PanelDrawing_Paint;
             panelDrawing.MouseDown += PanelDrawing_MouseDown;
+            // 
+            // buttonSaveMatrixH
+            // 
+            buttonSaveMatrixH.Location = new Point(12, 76);
+            buttonSaveMatrixH.Name = "buttonSaveMatrixH";
+            buttonSaveMatrixH.Size = new Size(122, 26);
+            buttonSaveMatrixH.TabIndex = 5;
+            buttonSaveMatrixH.Text = "Save Matrix H";
+            buttonSaveMatrixH.UseVisualStyleBackColor = true;
+            buttonSaveMatrixH.Click += ButtonSaveMatrixH_Click;
             // 
             // MainForm
             // 
@@ -136,5 +148,6 @@
         private Button buttonPointsOrig;
         private TextBox textBoxInfo;
         private Button buttonPointsRef;
+        private Button buttonSaveMatrixH;
     }
 }
