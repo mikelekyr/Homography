@@ -56,10 +56,10 @@ public partial class MainForm : Form
         InitializeComponent();
 
         // coord trans original
-        ctOrig.Xmin = 0f;
-        ctOrig.Xmax = 9.3333f;
+        ctOrig.Xmin = -3.3333333f;
+        ctOrig.Xmax = 3.3333333f;
         ctOrig.Ymin = 0f;
-        ctOrig.Ymax = 7f;
+        ctOrig.Ymax = 5f;
 
         ctOrig.Umin = 0;
         ctOrig.Umax = 639;
@@ -67,10 +67,10 @@ public partial class MainForm : Form
         ctOrig.Vmax = 0;
 
         // coord trans reference
-        ctRef.Xmin = 0f;
-        ctRef.Xmax = 9.3333f;
+        ctRef.Xmin = -3.3333333f;
+        ctRef.Xmax = 3.3333333f;
         ctRef.Ymin = 0f;
-        ctRef.Ymax = 7f;
+        ctRef.Ymax = 5f;
 
         ctRef.Umin = 640;
         ctRef.Umax = 1279;
@@ -78,10 +78,10 @@ public partial class MainForm : Form
         ctRef.Vmax = 0;
 
         // coord trans final
-        ctFinal.Xmin = 0f;
-        ctFinal.Xmax = 9.3333f;
+        ctFinal.Xmin = -3.3333333f; 
+        ctFinal.Xmax = 3.3333333f;
         ctFinal.Ymin = 0f;
-        ctFinal.Ymax = 7f;
+        ctFinal.Ymax = 5f;
 
         ctFinal.Umin = 0;
         ctFinal.Umax = 639;
@@ -112,7 +112,11 @@ public partial class MainForm : Form
 
         bitmapOrig = new("../../../Assets/imageOrig.png");
         bitmapRef = new("../../../Assets/imageRef.png");
-        bitmapFinal = (Bitmap)bitmapRef.Clone();
+
+        //bitmapOrig = (Bitmap)bitmapOrig.Clone();
+        //bitmapRef = (Bitmap)bitmapRef.Clone();
+
+        bitmapFinal = (Bitmap)bitmapOrig.Clone();
 
         RefreshData();
     }

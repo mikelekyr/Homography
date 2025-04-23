@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             panelMenu = new Panel();
+            buttonSaveMatrixH = new Button();
             buttonPointsRef = new Button();
             buttonPointsOrig = new Button();
             textBoxInfo = new TextBox();
             buttonRef = new Button();
             buttonLoadOrigImage = new Button();
             panelDrawing = new Panel();
-            buttonSaveMatrixH = new Button();
             panelMenu.SuspendLayout();
             SuspendLayout();
             // 
@@ -53,6 +53,16 @@
             panelMenu.Name = "panelMenu";
             panelMenu.Size = new Size(270, 984);
             panelMenu.TabIndex = 0;
+            // 
+            // buttonSaveMatrixH
+            // 
+            buttonSaveMatrixH.Location = new Point(12, 76);
+            buttonSaveMatrixH.Name = "buttonSaveMatrixH";
+            buttonSaveMatrixH.Size = new Size(122, 26);
+            buttonSaveMatrixH.TabIndex = 5;
+            buttonSaveMatrixH.Text = "Save Matrix H";
+            buttonSaveMatrixH.UseVisualStyleBackColor = true;
+            buttonSaveMatrixH.Click += ButtonSaveMatrixH_Click;
             // 
             // buttonPointsRef
             // 
@@ -114,16 +124,6 @@
             panelDrawing.Paint += PanelDrawing_Paint;
             panelDrawing.MouseDown += PanelDrawing_MouseDown;
             // 
-            // buttonSaveMatrixH
-            // 
-            buttonSaveMatrixH.Location = new Point(12, 76);
-            buttonSaveMatrixH.Name = "buttonSaveMatrixH";
-            buttonSaveMatrixH.Size = new Size(122, 26);
-            buttonSaveMatrixH.TabIndex = 5;
-            buttonSaveMatrixH.Text = "Save Matrix H";
-            buttonSaveMatrixH.UseVisualStyleBackColor = true;
-            buttonSaveMatrixH.Click += ButtonSaveMatrixH_Click;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -132,7 +132,6 @@
             Controls.Add(panelDrawing);
             Controls.Add(panelMenu);
             Name = "MainForm";
-            StartPosition = FormStartPosition.CenterScreen;
             Text = "Homography caluculator";
             panelMenu.ResumeLayout(false);
             panelMenu.PerformLayout();
