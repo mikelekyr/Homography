@@ -1,5 +1,4 @@
 using MathNet.Numerics.LinearAlgebra;
-using System.IO;
 using System.Text.Json;
 
 namespace HomographyApp;
@@ -20,18 +19,18 @@ public partial class MainForm : Form
 
     private readonly Point[] pointsOrig =
     [
-        new(144, 48),
-        new(60, 422),
-        new(579, 424),
-        new(505, 46)
+        new(117, 24),
+        new(73, 448),
+        new(552, 444),
+        new(517, 20)
     ];
 
     private readonly Point[] pointsRef =
     [
-        new(754, 35),
-        new(754, 444),
-        new(1164, 444),
-        new(1164, 35)
+        new(765, 30),
+        new(765, 446),
+        new(1159, 446),
+        new(1159, 30)
     ];
 
     private readonly Point[] pointsFinal = new Point[4];
@@ -56,10 +55,10 @@ public partial class MainForm : Form
         InitializeComponent();
 
         // coord trans original
-        ctOrig.Xmin = -3.3333333f;
-        ctOrig.Xmax = 3.3333333f;
+        ctOrig.Xmin = -3.25f;
+        ctOrig.Xmax = 3.25f;
         ctOrig.Ymin = 0f;
-        ctOrig.Ymax = 5f;
+        ctOrig.Ymax = 4.6f;
 
         ctOrig.Umin = 0;
         ctOrig.Umax = 639;
@@ -67,10 +66,10 @@ public partial class MainForm : Form
         ctOrig.Vmax = 0;
 
         // coord trans reference
-        ctRef.Xmin = -3.3333333f;
-        ctRef.Xmax = 3.3333333f;
+        ctRef.Xmin = -3.25f;
+        ctRef.Xmax = 3.25f;
         ctRef.Ymin = 0f;
-        ctRef.Ymax = 5f;
+        ctRef.Ymax = 4.6f;
 
         ctRef.Umin = 640;
         ctRef.Umax = 1279;
@@ -78,10 +77,10 @@ public partial class MainForm : Form
         ctRef.Vmax = 0;
 
         // coord trans final
-        ctFinal.Xmin = -3.3333333f; 
-        ctFinal.Xmax = 3.3333333f;
+        ctFinal.Xmin = -3.25f; 
+        ctFinal.Xmax = 3.25f;
         ctFinal.Ymin = 0f;
-        ctFinal.Ymax = 5f;
+        ctFinal.Ymax = 4.6f;
 
         ctFinal.Umin = 0;
         ctFinal.Umax = 639;
@@ -112,9 +111,6 @@ public partial class MainForm : Form
 
         bitmapOrig = new("../../../Assets/imageOrig.png");
         bitmapRef = new("../../../Assets/imageRef.png");
-
-        //bitmapOrig = (Bitmap)bitmapOrig.Clone();
-        //bitmapRef = (Bitmap)bitmapRef.Clone();
 
         bitmapFinal = (Bitmap)bitmapOrig.Clone();
 
